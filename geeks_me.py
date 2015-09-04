@@ -94,7 +94,7 @@ class G4GExtractor:
                         soup = BeautifulSoup(pagedata)
 
                         #Find all the title links in the page
-                        content_links = soup.findAll("h2", class_="post-title")
+                        content_links = soup.findAll("h2", class_="entry-title")
 
                         #Iterate every page and save the content links in a list
                         for link in content_links:
@@ -119,7 +119,7 @@ class G4GExtractor:
         for link in listoflinks:
             pagedata = urlopen(link).read()
             soup = BeautifulSoup(pagedata)
-            title = soup.find('h2', {"class": "post-title"})
+            title = soup.find('h1', {"class": "entry-title"})
             print link
 
             #Create File name to be saved as
