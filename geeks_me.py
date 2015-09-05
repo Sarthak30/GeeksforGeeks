@@ -94,7 +94,7 @@ class G4GExtractor:
                         soup = BeautifulSoup(pagedata)
 
                         #Find all the title links in the page
-                        content_links = soup.findAll("h2", class_="post-title")
+                        content_links = soup.findAll("h2", class_="entry-title")
 
                         #Iterate every page and save the content links in a list
                         for link in content_links:
@@ -104,7 +104,7 @@ class G4GExtractor:
                                     '"')[0]
                             listofLinks.append(mainLink)
                             print "Going to save data"
-                            self.save_pages(listofLinks, newpath, pdf)
+                            self.save_pages(listofLinks, newpath)
                         totallinks.append(listofLinks)
                     else:
                         print url + ' Returned Status 404'
@@ -119,7 +119,7 @@ class G4GExtractor:
         for link in listoflinks:
             pagedata = urlopen(link).read()
             soup = BeautifulSoup(pagedata)
-            title = soup.find('h2', {"class": "post-title"})
+            title = soup.find('h1', {"class": "entry-title"})
             print link
 
             #Create File name to be saved as
@@ -132,11 +132,8 @@ class G4GExtractor:
             try:
                 if os.path.exists(newpath):
                     filePath = newpath + "/" + filename
-                    if pdf:
-                        self.convertHtmlToPdf(pagedata, filePath + '.pdf')
-                    else:
-                        with open(filePath + '.html', "wb") as f:
-                            f.write(self.__remove_non_ascii(pagedata))
+                    with open(filePath + '.html', "wb") as f:
+						f.write(self.__remove_non_ascii(pagedata))
 
             except OSError as e:
                 print(e.message)
@@ -159,7 +156,7 @@ def demo():
     """
     A demo run if this app.
     """
-    demo_cat_list = ['bit-magic']
+    demo_cat_list = ['Array']
     path = '/root/PycharmProjects/GeekForGeeks-Spider/'
     demo = G4GExtractor()
     totallinks = len(demo.extract_content_and_save(demo_cat_list,True))
