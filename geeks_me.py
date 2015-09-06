@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
-from xhtml2pdf import pisa
 import os, httplib2, re
+import pdfkit
 
+i = 0
 
 class G4GExtractor:
     __BASE_WEB_URL = 'http://www.geeksforgeeks.org/category/'
@@ -86,7 +87,6 @@ class G4GExtractor:
                         url = self.__BASE_WEB_URL + cat + "/page/" + str(i) + "/"
 
                     print("Working with %s" % url)
-                    print "Sarthak"
 
                     #Check if the webpages have Status 200 or 404
                     if self.__valid_webpage(url):
@@ -103,8 +103,7 @@ class G4GExtractor:
                                     '"').split(
                                     '"')[0]
                             listofLinks.append(mainLink)
-                            print "Going to save data"
-                            self.save_pages(listofLinks, newpath)
+                        self.save_pages(listofLinks, newpath)
                         totallinks.append(listofLinks)
                     else:
                         print url + ' Returned Status 404'
@@ -114,13 +113,13 @@ class G4GExtractor:
 		print "Returning from save and extract data"
         return totallinks
 
-    def save_pages(self, listoflinks, newpath, pdf=False):
+    def save_pages(self, listoflinks, newpath, pdf=True):
+		
 
         for link in listoflinks:
             pagedata = urlopen(link).read()
             soup = BeautifulSoup(pagedata)
             title = soup.find('h1', {"class": "entry-title"})
-            print link
 
             #Create File name to be saved as
             filename = re.sub('[^a-zA-Z0-9\n\.]', '_', title.text)
@@ -132,32 +131,17 @@ class G4GExtractor:
             try:
                 if os.path.exists(newpath):
                     filePath = newpath + "/" + filename
-                    with open(filePath + '.html', "wb") as f:
-						f.write(self.__remove_non_ascii(pagedata))
+                    print filename+" saved"
+                    pdfkit.from_url(link,(filePath+".pdf"))
 
             except OSError as e:
                 print(e.message)
-
-    
-    def convertHtmlToPdf(self,sourceHtml, outputFilename):
-       
-        resultFile = open(outputFilename, "w+b")
-
-        # convert HTML to PDF
-        pisaStatus = pisa.CreatePDF(sourceHtml, dest=resultFile)
-
-        # close output file
-        resultFile.close()
-
-        # return True on success and False on errors
-        return pisaStatus.err
 
 def demo():
     """
     A demo run if this app.
     """
-    demo_cat_list = ['Array']
-    path = '/root/PycharmProjects/GeekForGeeks-Spider/'
+    demo_cat_list = ['bit-magic']
     demo = G4GExtractor()
     totallinks = len(demo.extract_content_and_save(demo_cat_list,True))
     print("Number of links crawled and saved is %d" % totallinks)
